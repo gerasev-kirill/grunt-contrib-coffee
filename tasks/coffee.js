@@ -47,7 +47,8 @@ module.exports = function(grunt) {
       } else if (options.join === true) {
         actionCounts.createdFile += writeCompiledFile(f.dest, concatInput(validFiles, options));
       } else {
-        actionCounts.createdFile += writeCompiledFile(f.dest, concatOutput(validFiles, options));
+        var dest = path.basename(validFiles[0], '.coffee');
+        actionCounts.createdFile += writeCompiledFile(path.join(path.dirname(validFiles[0]), dest + '.js'), concatOutput(validFiles, options));
       }
     });
 
@@ -179,7 +180,10 @@ module.exports = function(grunt) {
     }
 
     try {
-      return require('coffeescript').compile(code, coffeeOptions);
+      coffeeOptions.sourceMap = true;
+      coffeeOptions.inlineMap = true;
+      var out = require('coffeescript').compile(code, coffeeOptions);
+      return (out.js || out).split('//# sourceURL=')[0] + '//# sourceURL=../'  + path.basename(filepath);
     } catch (e) {
       if (e.location == null ||
           e.location.first_column == null ||
