@@ -180,10 +180,13 @@ module.exports = function(grunt) {
     }
 
     try {
-      coffeeOptions.sourceMap = true;
-      coffeeOptions.inlineMap = true;
+      //coffeeOptions.sourceMap = true;
+      //coffeeOptions.inlineMap = true;
       var out = require('coffeescript').compile(code, coffeeOptions);
-      return (out.js || out).split('//# sourceURL=')[0] + '//# sourceURL=../'  + path.basename(filepath);
+      if (coffeeOptions.sourceMap && coffeeOptions.inlineMap){
+          return (out.js || out).split('//# sourceURL=')[0] + '//# sourceURL=../'  + path.basename(filepath);
+      }
+      return out.js || out;
     } catch (e) {
       if (e.location == null ||
           e.location.first_column == null ||
